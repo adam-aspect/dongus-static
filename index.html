@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eggplane</title>
+<title>DONGUS Airlines</title>
 <style>
   html, body {
     margin: 0;
@@ -12,13 +12,133 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    cursor: default;
   }
-  img {
+  #hero {
     width: 96px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #hero:hover {
+    transform: scale(1.1);
+  }
+  #hero:active {
+    transform: scale(0.95);
+  }
+  .spawned {
+    position: fixed;
+    pointer-events: none;
+    image-rendering: pixelated;
+  }
+  #clickCount {
+    position: fixed;
+    bottom: 20px;
+    font-family: monospace;
+    color: #333;
+    font-size: 14px;
+    user-select: none;
+    transition: color 0.3s;
   }
 </style>
 </head>
 <body>
-<img src="EGGPLANE_WHITE.png" alt="Eggplane">
+<img id="hero" src="EGGPLANE_WHITE.png" alt="Eggplane">
+<div id="clickCount"></div>
+<script>
+const hero = document.getElementById('hero');
+const counter = document.getElementById('clickCount');
+let clicks = 0;
+
+const titles = [
+  'dongus','DONGUS','D O N G U S','dongus rising','dongus ascending',
+  'peak dongus','dongus singularity','dongus transcendence','MAXIMUM DONGUS',
+  'dongus beyond comprehension'
+];
+
+function spawn(x, y, size, angle, speed, spin, life) {
+  const img = document.createElement('img');
+  img.src = 'EGGPLANE_WHITE.png';
+  img.className = 'spawned';
+  img.style.width = size + 'px';
+  img.style.left = x + 'px';
+  img.style.top = y + 'px';
+  img.style.opacity = 1;
+  document.body.appendChild(img);
+
+  const vx = Math.cos(angle) * speed;
+  const vy = Math.sin(angle) * speed;
+  let frame = 0;
+
+  function tick() {
+    frame++;
+    const px = x + vx * frame;
+    const py = y + vy * frame + 0.15 * frame * frame;
+    const rot = spin * frame;
+    const opacity = Math.max(0, 1 - frame / life);
+    img.style.left = px + 'px';
+    img.style.top = py + 'px';
+    img.style.transform = `rotate(${rot}deg)`;
+    img.style.opacity = opacity;
+    if (frame < life) {
+      requestAnimationFrame(tick);
+    } else {
+      img.remove();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function burst(cx, cy, count, sizeRange, speedRange) {
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.5;
+    const speed = speedRange[0] + Math.random() * (speedRange[1] - speedRange[0]);
+    const size = sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0]);
+    const spin = (Math.random() - 0.5) * 20;
+    const life = 40 + Math.random() * 60;
+    spawn(cx, cy, size, angle, speed, spin, life);
+  }
+}
+
+function shake(intensity, duration) {
+  const start = Date.now();
+  function tick() {
+    const elapsed = Date.now() - start;
+    if (elapsed > duration) {
+      document.body.style.transform = '';
+      return;
+    }
+    const x = (Math.random() - 0.5) * intensity;
+    const y = (Math.random() - 0.5) * intensity;
+    document.body.style.transform = `translate(${x}px, ${y}px)`;
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+hero.addEventListener('click', () => {
+  clicks++;
+  const rect = hero.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  const tier = Math.min(clicks, 10);
+  const count = tier * 3;
+  const maxSize = 16 + tier * 8;
+  const speed = 2 + tier * 0.8;
+
+  burst(cx, cy, count, [8, maxSize], [1, speed]);
+
+  if (clicks >= 3) {
+    shake(tier * 1.5, 200 + tier * 30);
+  }
+
+  document.title = titles[Math.min(tier, titles.length) - 1];
+  counter.textContent = clicks === 1 ? '1 dongus' : clicks + ' donguses';
+  counter.style.color = `hsl(${clicks * 37 % 360}, 70%, 50%)`;
+});
+</script>
 </body>
 </html>
