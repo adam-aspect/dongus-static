@@ -181,6 +181,9 @@ hero.addEventListener('click', () => {
     ], { duration: 1200, easing: 'ease-out' });
   }
 
+  const growth = 1 + Math.floor(clicks / 100) * 0.15;
+  hero.style.width = (96 * growth) + 'px';
+
   document.title = titles[Math.min(tier, titles.length) - 1];
   counter.textContent = clicks === 1 ? '1 dongus' : clicks + ' donguses';
   counter.style.color = `hsl(${clicks * 37 % 360}, 70%, 50%)`;
