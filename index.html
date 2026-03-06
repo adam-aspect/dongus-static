@@ -9,11 +9,24 @@
     margin: 0;
     height: 100%;
     background: #000;
+    overflow: hidden;
+    cursor: default;
+  }
+  #shaker {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    cursor: default;
+  }
+  #particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
   }
   #hero {
     width: 96px;
@@ -29,8 +42,7 @@
     transform: scale(0.95);
   }
   .spawned {
-    position: fixed;
-    pointer-events: none;
+    position: absolute;
     image-rendering: pixelated;
   }
   #nice {
@@ -49,20 +61,28 @@
   #clickCount {
     position: fixed;
     bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: monospace;
     color: #333;
     font-size: 14px;
     user-select: none;
     transition: color 0.3s;
+    z-index: 20;
   }
 </style>
 </head>
 <body>
-<img id="hero" src="EGGPLANE_WHITE.png" alt="Eggplane">
+<div id="shaker">
+  <img id="hero" src="EGGPLANE_WHITE.png" alt="Eggplane">
+</div>
+<div id="particles"></div>
 <div id="nice">NICE!</div>
 <div id="clickCount"></div>
 <script>
 const hero = document.getElementById('hero');
+const particles = document.getElementById('particles');
+const shaker = document.getElementById('shaker');
 const counter = document.getElementById('clickCount');
 let clicks = 0;
 
@@ -80,7 +100,7 @@ function spawn(x, y, size, angle, speed, spin, life) {
   img.style.left = x + 'px';
   img.style.top = y + 'px';
   img.style.opacity = 1;
-  document.body.appendChild(img);
+  particles.appendChild(img);
 
   const vx = Math.cos(angle) * speed;
   const vy = Math.sin(angle) * speed;
@@ -92,7 +112,6 @@ function spawn(x, y, size, angle, speed, spin, life) {
     const px = x + vx * frame;
     const py = y + vy * frame + 0.03 * frame * frame;
     const rot = spin * frame;
-    // stay fully visible for 60%, then fade
     const opacity = progress < 0.6 ? 1 : Math.max(0, 1 - (progress - 0.6) / 0.4);
     img.style.left = px + 'px';
     img.style.top = py + 'px';
@@ -123,12 +142,12 @@ function shake(intensity, duration) {
   function tick() {
     const elapsed = Date.now() - start;
     if (elapsed > duration) {
-      document.body.style.transform = '';
+      shaker.style.transform = '';
       return;
     }
     const x = (Math.random() - 0.5) * intensity;
     const y = (Math.random() - 0.5) * intensity;
-    document.body.style.transform = `translate(${x}px, ${y}px)`;
+    shaker.style.transform = `translate(${x}px, ${y}px)`;
     requestAnimationFrame(tick);
   }
   tick();
