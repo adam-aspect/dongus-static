@@ -33,6 +33,19 @@
     pointer-events: none;
     image-rendering: pixelated;
   }
+  #nice {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-family: Impact, sans-serif;
+    font-size: 20vw;
+    color: #fff;
+    pointer-events: none;
+    z-index: 999;
+    text-shadow: 0 0 40px #ff0, 0 0 80px #f0f;
+    opacity: 0;
+  }
   #clickCount {
     position: fixed;
     bottom: 20px;
@@ -46,6 +59,7 @@
 </head>
 <body>
 <img id="hero" src="EGGPLANE_WHITE.png" alt="Eggplane">
+<div id="nice">NICE!</div>
 <div id="clickCount"></div>
 <script>
 const hero = document.getElementById('hero');
@@ -135,6 +149,17 @@ hero.addEventListener('click', () => {
 
   if (clicks >= 3) {
     shake(tier * 1.5, 200 + tier * 30);
+  }
+
+  if (clicks === 69) {
+    const nice = document.getElementById('nice');
+    nice.animate([
+      { opacity: 0, transform: 'translate(-50%, -50%) scale(0.3)' },
+      { opacity: 1, transform: 'translate(-50%, -50%) scale(1.1)', offset: 0.15 },
+      { opacity: 1, transform: 'translate(-50%, -50%) scale(1)', offset: 0.3 },
+      { opacity: 1, transform: 'translate(-50%, -50%) scale(1)', offset: 0.7 },
+      { opacity: 0, transform: 'translate(-50%, -50%) scale(1.5)' }
+    ], { duration: 1200, easing: 'ease-out' });
   }
 
   document.title = titles[Math.min(tier, titles.length) - 1];
