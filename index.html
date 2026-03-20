@@ -97,6 +97,9 @@ const titles = [
 
 const activeParticles = [];
 let animating = false;
+const preloadedImg = new Image();
+preloadedImg.src = 'EGGPLANE_WHITE.png';
+preloadedImg.decode().catch(() => {});
 
 function animateParticles() {
   for (let i = activeParticles.length - 1; i >= 0; i--) {
@@ -121,32 +124,31 @@ function animateParticles() {
   }
 }
 
-function spawn(x, y, size, angle, speed, spin, life) {
-  const img = document.createElement('img');
-  img.src = 'EGGPLANE_WHITE.png';
-  img.className = 'spawned';
-  img.style.width = size + 'px';
-  particles.appendChild(img);
-
-  activeParticles.push({
-    img, x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-    spin, life, frame: 0
-  });
-
-  if (!animating) {
-    animating = true;
-    requestAnimationFrame(animateParticles);
-  }
-}
-
 function burst(cx, cy, count, sizeRange, speedRange) {
+  const frag = document.createDocumentFragment();
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.4;
     const speed = speedRange[0] + Math.random() * (speedRange[1] - speedRange[0]);
     const size = sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0]);
     const spin = (Math.random() - 0.5) * 8;
     const life = 80 + Math.random() * 100;
-    spawn(cx, cy, size, angle, speed, spin, life);
+
+    const img = preloadedImg.cloneNode();
+    img.className = 'spawned';
+    img.style.width = size + 'px';
+    frag.appendChild(img);
+
+    activeParticles.push({
+      img, x: cx, y: cy,
+      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      spin, life, frame: 0
+    });
+  }
+  particles.appendChild(frag);
+
+  if (!animating) {
+    animating = true;
+    requestAnimationFrame(animateParticles);
   }
 }
 
